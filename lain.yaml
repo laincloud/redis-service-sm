@@ -1,0 +1,68 @@
+appname: redis-service-sm
+
+build:
+  base: laincloud/centos-redis-python:redis3.0.7
+  prepare:
+    version: redis20160510
+    script: 
+      - mkdir -p $GOPATH/src/github.com/laincloud
+      - ln -s /lain/app $GOPATH/src/github.com/laincloud/redis-service-sm
+  script:
+    - cd $GOPATH/src/github.com/laincloud/redis-service-sm/redis-ctl && go build -o redis-ctld
+    - cd $GOPATH/src/github.com/laincloud/redis-service-sm/redis-proxy && go build -o redis-proxyd
+    - cd /lain/app
+    - cp redis-server.sh /redis-server
+    - cp redis-proxy.sh /redis-proxy
+    - cp redis-ctl.sh /redis-ctl
+    - cp redis-sentinel.sh /redis-sentinel
+
+proc.redis:
+  cmd: /redis-server
+  port: 6379
+  memory: 64m
+  num_instances: 2
+  persistent_dirs:
+    - /var/log/supervisor
+    - /redis
+    - /redis/recover
+    - /redis/data_incrbackup: # 特殊配置
+        backup_increment: # 配置增量备份
+          schedule: "*/5 * * * *" # 备份策略
+          expire: "10d" # 过期时间,数字+单位, 如10d表示10天, 10h表示10小时, 3m表示3分钟
+          pre_run: "/lain/app/tools/incrbackup.sh" # pre hook, 备份执行前调用
+          post_run: "/lain/app/tools/end-incrbackup.sh" # post hook, 备份结束后调用
+    - /redis/data_fullbackup: # 特殊配置
+       backup_full: # 配置全量备份
+          schedule: "0 3 * * *" # 备份策略
+          expire: "30d" # 过期时间,数字+单位, 如10d表示10天, 10h表示10小时, 3m表示3分钟
+          pre_run: "/lain/app/tools/fullbackup.sh" # pre hook, 备份执行前调用
+          post_run: "/lain/app/tools/end-fullbackup.sh" # post hook, 备份结束后调用
+
+proc.redis-ctl:
+  cmd: /redis-ctl
+  port: 8091
+  memory: 32m
+  num_instances: 1
+  persistent_dirs:
+    - /data
+
+proc.redis-sentinel:
+  cmd: /redis-sentinel
+  port: 26379
+  memory: 32m
+  num_instances: 3
+  persistent_dirs:
+    - /redis
+
+portal.portal-redis:
+  service_name: redis
+  allow_clients: "**"
+  cmd: /redis-proxy
+  memory: 32m
+  port: 8889
+  persistent_dirs:
+    - /var/log/supervisor
+
+notify:
+  slack: "#lain"
+

@@ -1,0 +1,158 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "fcfxNsCuheCrubAAl6zWgimCnLY=",
+			"origin": "github.com/laincloud/lainlet/vendor/github.com/codegangsta/inject",
+			"path": "github.com/codegangsta/inject",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "sK8hJc/nXam8rslMKvI65P8A8Cc=",
+			"origin": "github.com/laincloud/lainlet/vendor/github.com/go-martini/martini",
+			"path": "github.com/go-martini/martini",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "efKH3sFJE6kE1XwMFMu+35Rgogw=",
+			"origin": "github.com/laincloud/lainlet/vendor/github.com/laincloud/deployd/cluster",
+			"path": "github.com/laincloud/deployd/cluster",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "tbF4qAcB+gmGq6ig57Nry1ivtkY=",
+			"origin": "github.com/laincloud/lainlet/vendor/github.com/laincloud/deployd/engine",
+			"path": "github.com/laincloud/deployd/engine",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "s9xJXshISO7EuhSQnn0maWkyDZc=",
+			"origin": "github.com/laincloud/lainlet/vendor/github.com/laincloud/deployd/storage",
+			"path": "github.com/laincloud/deployd/storage",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "2VoB1ixvGBUb0dniryDWhyznezA=",
+			"path": "github.com/laincloud/lainlet/api",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "Oz5YjUlqQgO1fEPPBz/3y2AD/lo=",
+			"path": "github.com/laincloud/lainlet/api/v2",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "D5pW+bfIhL42Lg35GRan5GM6ryU=",
+			"path": "github.com/laincloud/lainlet/auth",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "dpj+PQoQhUCQfgCFN+9Umpz1Vxc=",
+			"path": "github.com/laincloud/lainlet/client",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "bFF2SBZk6am9jqd5slD5WFAgMoI=",
+			"path": "github.com/laincloud/lainlet/store",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "aFX2eLH5IGomfzw5x3aTO0xb5o0=",
+			"path": "github.com/laincloud/lainlet/watcher",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "Hq9l/dTMNNbMfzClL6iF+7qT92A=",
+			"path": "github.com/laincloud/lainlet/watcher/config",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "9HBZK0H6sXGBvMSapNhzWARUkGg=",
+			"path": "github.com/laincloud/lainlet/watcher/container",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "/oAgZ/r6kuk+0gg1jlVRTokYUZI=",
+			"path": "github.com/laincloud/lainlet/watcher/depends",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "7gRk/bOOJcrJp9v4pmORV+YAnT4=",
+			"path": "github.com/laincloud/lainlet/watcher/nodes",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "4muIhZiGuvwP5SVkGmy/+0+iwjk=",
+			"path": "github.com/laincloud/lainlet/watcher/podgroup",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "iz8QJ+/FmsIGY99b+iCJJkGaRIg=",
+			"path": "github.com/laincloud/redis-libs/network",
+			"revision": "2735c2cc5dbd5f732ca7536bc5cb1f6d5a5eab5f",
+			"revisionTime": "2016-05-06T08:11:34Z"
+		},
+		{
+			"checksumSHA1": "XKRyILiLKupN+iiVxBJQqthtsog=",
+			"path": "github.com/laincloud/redis-libs/redislibs",
+			"revision": "2735c2cc5dbd5f732ca7536bc5cb1f6d5a5eab5f",
+			"revisionTime": "2016-05-06T08:11:34Z"
+		},
+		{
+			"checksumSHA1": "cTey1/kbiHbQdI45Eh6g9cP+qdg=",
+			"path": "github.com/laincloud/redis-libs/utils",
+			"revision": "2735c2cc5dbd5f732ca7536bc5cb1f6d5a5eab5f",
+			"revisionTime": "2016-05-06T08:11:34Z"
+		},
+		{
+			"checksumSHA1": "yj8KD7zx2Z+JHR+VelvojuSDurk=",
+			"origin": "github.com/laincloud/lainlet/vendor/github.com/mijia/adoc",
+			"path": "github.com/mijia/adoc",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "o7e6f7Ddy7KDm4JNxs01gBN6DJc=",
+			"origin": "github.com/laincloud/lainlet/vendor/github.com/mijia/go-generics",
+			"path": "github.com/mijia/go-generics",
+			"revision": "f9b447e76640833e7b47d7ae29494806f4f610b6",
+			"revisionTime": "2016-05-06T03:48:15Z"
+		},
+		{
+			"checksumSHA1": "EskkDWg/7RcNa16FCA5qHNlGvQg=",
+			"path": "github.com/mijia/sweb/log",
+			"revision": "169a3affd5ea43b3aaaa81744a0b86ff89e2b3f3",
+			"revisionTime": "2015-12-25T09:11:39Z"
+		},
+		{
+			"checksumSHA1": "UpD3DOBV4ke+MSUYOotu4qciG7A=",
+			"path": "github.com/robfig/config",
+			"revision": "0f78529c8c7e3e9a25f15876532ecbc07c7d99e6",
+			"revisionTime": "2014-12-07T22:47:36Z"
+		},
+		{
+			"checksumSHA1": "5ARrN3Zq+E9zazFb/N+b08Serys=",
+			"path": "golang.org/x/net/context",
+			"revision": "35b06af0720201bc2f326773a80767387544f8c4",
+			"revisionTime": "2016-03-15T03:00:09Z"
+		}
+	],
+	"rootPath": "github.com/laincloud/redis-service-sm"
+}
