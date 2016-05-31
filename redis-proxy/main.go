@@ -4,6 +4,7 @@ import (
 	"github.com/laincloud/redis-service-sm/redis-proxy/proxy"
 	"github.com/mijia/sweb/log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -16,6 +17,11 @@ func main() {
 		log.EnableDebug()
 	}
 	proxy.StartWatcher()
-	p := proxy.NEW()
-	p.StartServer()
+	for {
+		p := proxy.NewProxy()
+		p.StartServer()
+		p.StopServer()
+		time.Sleep(60 * time.Second)
+	}
+
 }
