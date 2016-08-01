@@ -1,9 +1,9 @@
 package monitor
 
 import (
-	"github.com/mijia/sweb/log"
 	"github.com/laincloud/redis-libs/redislibs"
 	"github.com/laincloud/redis-service-sm/redis-lainlet/redislainlet"
+	"github.com/mijia/sweb/log"
 	"strconv"
 	"time"
 )
@@ -14,6 +14,8 @@ func RedisServerMonitor(redis_addrs map[int]*redislibs.Address) {
 			log.Debug(r)
 			tm := time.Now()
 			ReportDatas(r, strconv.FormatInt(tm.Unix(), 10))
+		} else {
+			log.Error(err.Error())
 		}
 	}
 }

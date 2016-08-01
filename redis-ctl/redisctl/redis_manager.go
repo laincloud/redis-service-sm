@@ -63,6 +63,7 @@ func ManagerRedisService(redis_addrs map[int]*redislibs.Address, sentinel_addrs 
 	CheckAndInitRedisSentinel(sentinel_addrs, sys_master)
 	sys_master = getMaster(sentinel_addrs)
 	if sys_master == nil {
+		log.Warn("No Master")
 		return
 	}
 	slaves := getSlaves(sentinel_addrs)
