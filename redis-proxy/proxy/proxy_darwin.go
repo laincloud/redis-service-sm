@@ -14,18 +14,17 @@ type aeApiState struct {
 	kq      int
 	skfd    int
 	events  []syscall.Kevent_t
-	handler msgHandler
+	fetcher msgFetcher
 	timeout *syscall.Timespec
 }
 
-func aeApiStateCreate(handler msgHandler) *aeApiState {
+func aeApiStateCreate(fetcher msgFetcher) *aeApiState {
 
 	fd, err := socket()
 	if err != nil {
 		log.Error("Create Socker err:", err)
 		return nil
 	}
-	log.Info(fd)
 	kq, err := syscall.Kqueue()
 	if err != nil {
 		log.Error("Error creating Kqueue descriptor!")
@@ -37,7 +36,7 @@ func aeApiStateCreate(handler msgHandler) *aeApiState {
 		Sec:  0,
 		Nsec: 0,
 	}
-	ae := &aeApiState{skfd: fd, kq: kq, events: events, handler: handler, timeout: &timeout}
+	ae := &aeApiState{skfd: fd, kq: kq, events: events, fetcher: fetcher, timeout: &timeout}
 	ae.addEvent(fd)
 	return ae
 }

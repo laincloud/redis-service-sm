@@ -58,7 +58,7 @@ portal.portal-redis:
   service_name: redis
   allow_clients: "**"
   cmd: /redis-proxy
-  memory: 256m
+  memory: 128m
   port: 8889
   persistent_dirs:
     - /var/log/supervisor

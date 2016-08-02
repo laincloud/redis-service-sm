@@ -12,7 +12,7 @@ var (
 	PROC_REDIS_NAME   = GetEnvDefault("PROC_REDIS_NAME", "redis")
 	PROC_SENTILE_NAME = GetEnvDefault("PROC_SENTILE_NAME", "redis-sentinel")
 
-	ERROR_IDLE_TIME = 1000
+	ERROR_IDLE_TIME = 10000
 )
 
 func GetEnvDefault(key, defaultValue string) string {

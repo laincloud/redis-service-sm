@@ -14,10 +14,10 @@ type aeApiState struct {
 	epfd    int
 	skfd    int
 	events  [MaxEpollEvents]syscall.EpollEvent
-	handler msgHandler
+	fetcher msgFetcher
 }
 
-func aeApiStateCreate(handler msgHandler) *aeApiState {
+func aeApiStateCreate(fetcher msgFetcher) *aeApiState {
 	var event syscall.EpollEvent
 	var events [MaxEpollEvents]syscall.EpollEvent
 
@@ -39,7 +39,7 @@ func aeApiStateCreate(handler msgHandler) *aeApiState {
 		log.Error("epoll_ctl: ", e)
 		return nil
 	}
-	ae := &aeApiState{epfd: epfd, skfd: fd, events: events, handler: handler}
+	ae := &aeApiState{epfd: epfd, skfd: fd, events: events, fetcher: fetcher}
 	return ae
 
 }

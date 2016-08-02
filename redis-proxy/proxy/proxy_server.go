@@ -2,6 +2,8 @@ package proxy
 
 import (
 	"errors"
+	"github.com/laincloud/redis-libs/network"
+	"github.com/laincloud/redis-libs/redislibs"
 	"github.com/mijia/sweb/log"
 	"net"
 	"syscall"
@@ -13,23 +15,23 @@ const (
 	aeBufferSize = 32 * 1024
 )
 
-func (ae *aeApiState) handleMessage(fd int) {
-	var buf [aeBufferSize]byte
-	msg := ""
-	for {
-		nbytes, e := syscall.Read(fd, buf[:])
-		msg += string(buf[:nbytes])
-		if e != nil || nbytes < aeBufferSize {
-			break
-		}
-	}
-	if resp, err := ae.handler(msg); err == nil {
-		syscall.Write(fd, []byte(resp))
-	} else {
-		log.Error(err.Error())
-		syscall.Write(fd, []byte(errRedisDown.Error()))
-	}
+type msgFetcher func(msg []byte) ([]byte, error)
 
+func (ae *aeApiState) handleMessage(fd int) {
+	b, err := network.SyscallRead(fd, aeBufferSize)
+	if err != nil {
+		network.SyscallWrite(fd, []byte(err.Error()), aeBufferSize)
+		return
+	}
+	msg := string(b)
+	if msg == redislibs.Pack_command("COMMAND") {
+		msg = redislibs.Pack_command("PING")
+	}
+	if resp, err := ae.fetcher([]byte(msg)); err == nil {
+		network.SyscallWrite(fd, resp, aeBufferSize)
+	} else {
+		network.SyscallWrite(fd, []byte(err.Error()), aeBufferSize)
+	}
 }
 
 func (ae *aeApiState) accept() {

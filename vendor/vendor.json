@@ -104,22 +104,22 @@
 			"revisionTime": "2016-05-27T08:54:33Z"
 		},
 		{
-			"checksumSHA1": "iz8QJ+/FmsIGY99b+iCJJkGaRIg=",
+			"checksumSHA1": "Da/sfOhNmgVZdlk55rHzrIf28ps=",
 			"path": "github.com/laincloud/redis-libs/network",
-			"revision": "8ab70c2b4db66d82b2d62fd5ff7e17a8380329b8",
-			"revisionTime": "2016-08-01T15:43:37Z"
+			"revision": "929ce990ca92efdd266327dc61d0d48a958696b4",
+			"revisionTime": "2016-08-05T03:19:52Z"
 		},
 		{
-			"checksumSHA1": "ctvmtM04kvFfkECPRor/pRzseEI=",
+			"checksumSHA1": "XaZya7pAHpWwpGG7TcDuDZ5TxX0=",
 			"path": "github.com/laincloud/redis-libs/redislibs",
-			"revision": "8ab70c2b4db66d82b2d62fd5ff7e17a8380329b8",
-			"revisionTime": "2016-08-01T15:43:37Z"
+			"revision": "929ce990ca92efdd266327dc61d0d48a958696b4",
+			"revisionTime": "2016-08-05T03:19:52Z"
 		},
 		{
 			"checksumSHA1": "cTey1/kbiHbQdI45Eh6g9cP+qdg=",
 			"path": "github.com/laincloud/redis-libs/utils",
-			"revision": "8ab70c2b4db66d82b2d62fd5ff7e17a8380329b8",
-			"revisionTime": "2016-08-01T15:43:37Z"
+			"revision": "929ce990ca92efdd266327dc61d0d48a958696b4",
+			"revisionTime": "2016-08-05T03:19:52Z"
 		},
 		{
 			"checksumSHA1": "yj8KD7zx2Z+JHR+VelvojuSDurk=",
@@ -149,11 +149,11 @@
 			"revisionTime": "2014-12-07T22:47:36Z"
 		},
 		{
-			"checksumSHA1": "pancewZW3HwGvpDwfH5Imrbadc4=",
+			"checksumSHA1": "9jjO5GjLa0XF/nfWihF02RoH4qc=",
 			"origin": "github.com/laincloud/lainlet/vendor/golang.org/x/net/context",
 			"path": "golang.org/x/net/context",
-			"revision": "52320532ba895211fdab75d57df436de68abb656",
-			"revisionTime": "2016-05-27T08:54:33Z"
+			"revision": "28d1bd4fbe7e56c9025ffe3a89113fa4f5e48f31",
+			"revisionTime": "2016-07-30T20:25:50Z"
 		}
 	],
 	"rootPath": "github.com/laincloud/redis-service-sm"

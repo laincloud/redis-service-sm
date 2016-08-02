@@ -3,6 +3,7 @@ package proxy
 import (
 	"github.com/laincloud/redis-libs/network"
 	"github.com/laincloud/redis-libs/redislibs"
+	"github.com/mijia/sweb/log"
 	"net"
 	"time"
 )
@@ -12,21 +13,24 @@ type Proxy struct {
 	aes  *aeApiState
 }
 
-type msgHandler func(msg string) (string, error)
-
 func NewProxy() *Proxy {
 	master_addr = redislibs.BuildAddress("127.0.0.1", "6001")
 
 	co := network.NewConnectOption(ReadTimeoutSec, WriteTimeOutSec, BufferSize)
-	pool := network.NewConnectionPool(co, func() (net.Conn, error) {
+	pool := network.NewConnectionPool(co, func() (network.IConn, error) {
 		if master_addr == nil {
 			return nil, errRedisDown
 		}
-		return net.DialTimeout("tcp", master_addr.String(), time.Second*time.Duration(ConnTimeoutSec))
+		if conn, err := net.DialTimeout("tcp", master_addr.String(),
+			time.Second*time.Duration(ConnTimeoutSec)); err == nil {
+			return network.NewRedisConn(conn, co)
+		} else {
+			return nil, err
+		}
 	}, MaxActive, MaxIdle, PoolIdleTimeOutSec)
 
-	pool.SetConnStateTest(func(c *network.Conn) bool {
-		if err := c.Write(redislibs.COMMAND_PING); err != nil {
+	pool.SetConnStateTest(func(c network.IConn) bool {
+		if err := c.Write([]byte(redislibs.COMMAND_PING)); err != nil {
 			return false
 		}
 		// clear test response info
@@ -38,7 +42,7 @@ func NewProxy() *Proxy {
 
 	p := &Proxy{pool: pool}
 
-	p.aes = aeApiStateCreate(p.handleMsg)
+	p.aes = aeApiStateCreate(p.redisMsgFetcher)
 
 	return p
 }
@@ -54,15 +58,16 @@ func (p *Proxy) StopServer() {
 	p.aes.close()
 }
 
-func (p *Proxy) handleMsg(reqs string) (string, error) {
+func (p *Proxy) redisMsgFetcher(reqs []byte) ([]byte, error) {
 	redisConn, err := p.pool.FetchConn()
 	if err != nil {
-		return "", err
+		log.Error(err.Error())
+		return nil, err
 	}
 	defer p.pool.Finished(redisConn)
-	err = redisConn.Write(reqs)
-	if err != nil {
-		return "", err
+	if err = redisConn.Write([]byte(reqs)); err != nil {
+		log.Error(err.Error())
+		return nil, err
 	}
 	return redisConn.ReadAll()
 }

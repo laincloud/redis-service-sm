@@ -28,12 +28,20 @@ func StartLainLet() {
 		if err != nil {
 			continue
 		}
-		for event := range ch {
-			if event.Id != 0 { // id == 0 means error-event or heartbeat
-				if err := info.Decode(event.Data); err == nil {
-					handleLainLetInfo(info)
+
+		for {
+			select {
+			case event, ok := <-ch:
+				if !ok {
+					break
+				}
+				if event.Id != 0 { // id == 0 means error-event or heartbeat
+					if err := info.Decode(event.Data); err == nil {
+						handleLainLetInfo(info)
+					}
 				}
 			}
+
 		}
 	}
 
