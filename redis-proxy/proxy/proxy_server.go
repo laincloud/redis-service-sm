@@ -11,16 +11,12 @@ import (
 
 var errRedisDown = errors.New("-Error redis is down\r\n")
 
-const (
-	aeBufferSize = 32 * 1024
-)
-
 type msgFetcher func(msg []byte) ([]byte, error)
 
 func (ae *aeApiState) handleMessage(fd int) {
-	b, err := network.SyscallRead(fd, aeBufferSize)
+	b, err := network.SyscallRead(fd, BufferSize)
 	if err != nil {
-		network.SyscallWrite(fd, []byte(err.Error()), aeBufferSize)
+		network.SyscallWrite(fd, []byte(err.Error()), BufferSize)
 		return
 	}
 	msg := string(b)
@@ -28,9 +24,9 @@ func (ae *aeApiState) handleMessage(fd int) {
 		msg = redislibs.Pack_command("PING")
 	}
 	if resp, err := ae.fetcher([]byte(msg)); err == nil {
-		network.SyscallWrite(fd, resp, aeBufferSize)
+		network.SyscallWrite(fd, resp, BufferSize)
 	} else {
-		network.SyscallWrite(fd, []byte(err.Error()), aeBufferSize)
+		network.SyscallWrite(fd, []byte(err.Error()), BufferSize)
 	}
 }
 
