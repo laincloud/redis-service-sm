@@ -61,7 +61,6 @@ func (p *Proxy) StopServer() {
 func (p *Proxy) redisMsgFetcher(reqs []byte) ([]byte, error) {
 	redisConn, err := p.pool.FetchConn()
 	if err != nil {
-		log.Error(err.Error())
 		return nil, err
 	}
 	defer p.pool.Finished(redisConn)

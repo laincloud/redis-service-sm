@@ -51,7 +51,7 @@ func (ae *aeApiState) startAeApiPoll() {
 			log.Info("Error creating kevent")
 		}
 		if nev == 0 {
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(100 * time.Microsecond)
 			continue
 		}
 		for i := 0; i < nev; i++ {

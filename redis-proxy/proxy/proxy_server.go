@@ -36,7 +36,7 @@ func (ae *aeApiState) accept() {
 		ae.accept()
 	}
 	if err != nil {
-		log.Error("accept err: ", err)
+		log.Fatal("accept err: ", err)
 		return
 	}
 	log.Info("new connection:", connFd)
