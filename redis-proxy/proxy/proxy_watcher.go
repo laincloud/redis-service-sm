@@ -1,9 +1,9 @@
 package proxy
 
 import (
-	"github.com/mijia/sweb/log"
 	"github.com/laincloud/redis-libs/redislibs"
 	"github.com/laincloud/redis-service-sm/redis-lainlet/redislainlet"
+	"github.com/mijia/sweb/log"
 	"time"
 )
 

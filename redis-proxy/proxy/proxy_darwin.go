@@ -69,6 +69,9 @@ func (ae *aeApiState) startAeApiPoll() {
 }
 
 func (ae *aeApiState) close() {
+	if ae == nil {
+		return
+	}
 	syscall.Close(ae.skfd)
 	syscall.Close(ae.kq)
 }

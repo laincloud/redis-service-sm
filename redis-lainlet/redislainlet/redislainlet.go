@@ -4,6 +4,7 @@ import (
 	api "github.com/laincloud/lainlet/api/v2"
 	"github.com/laincloud/lainlet/client"
 	"github.com/laincloud/redis-libs/redislibs"
+	"github.com/mijia/sweb/log"
 	"golang.org/x/net/context"
 	"strconv"
 	"sync"
@@ -28,20 +29,31 @@ func StartLainLet() {
 		if err != nil {
 			continue
 		}
-
+		breakWatch := false
 		for {
 			select {
 			case event, ok := <-ch:
 				if !ok {
+					breakWatch = true
 					break
+				}
+				if event.Id == 0 {
+					if event.Event == "error" {
+						log.Errorf("id:%v, event:%v, Fail to watch lainlet", event.Id, event.Event)
+						time.Sleep(time.Duration(ERROR_IDLE_TIME) * time.Millisecond)
+					}
+					continue
 				}
 				if event.Id != 0 { // id == 0 means error-event or heartbeat
 					if err := info.Decode(event.Data); err == nil {
 						handleLainLetInfo(info)
 					}
 				}
+				break
 			}
-
+			if breakWatch {
+				break
+			}
 		}
 	}
 

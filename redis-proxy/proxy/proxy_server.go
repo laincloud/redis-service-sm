@@ -16,7 +16,7 @@ type msgFetcher func(msg []byte) ([]byte, error)
 func (ae *aeApiState) handleMessage(fd int) {
 	b, err := network.SyscallRead(fd, BufferSize)
 	if err != nil {
-		network.SyscallWrite(fd, []byte(err.Error()), BufferSize)
+		network.SyscallWrite(fd, []byte(errRedisDown.Error()), BufferSize)
 		return
 	}
 	msg := string(b)
@@ -26,7 +26,7 @@ func (ae *aeApiState) handleMessage(fd int) {
 	if resp, err := ae.fetcher([]byte(msg)); err == nil {
 		network.SyscallWrite(fd, resp, BufferSize)
 	} else {
-		network.SyscallWrite(fd, []byte(err.Error()), BufferSize)
+		network.SyscallWrite(fd, []byte(errRedisDown.Error()), BufferSize)
 	}
 }
 
