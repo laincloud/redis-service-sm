@@ -59,7 +59,7 @@ portal.portal-redis:
   allow_clients: "**"
   cmd: /redis-proxy
   memory: 128m
-  port: 8889
+  port: 6379
   persistent_dirs:
     - /var/log/supervisor
 

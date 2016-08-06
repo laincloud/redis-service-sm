@@ -1,17 +1,17 @@
 package proxy
 
 import (
+	"bytes"
 	"errors"
 	"github.com/laincloud/redis-libs/network"
 	"github.com/laincloud/redis-libs/redislibs"
 	"github.com/mijia/sweb/log"
 	"net"
+	"strings"
 	"syscall"
 )
 
 var errRedisDown = errors.New("-Error redis is down\r\n")
-
-type msgFetcher func(msg []byte) ([]byte, error)
 
 func (ae *aeApiState) handleMessage(fd int) {
 	b, err := network.SyscallRead(fd, BufferSize)
@@ -20,28 +20,54 @@ func (ae *aeApiState) handleMessage(fd int) {
 		return
 	}
 	msg := string(b)
+	if strings.Trim(msg, " ") == "" {
+		return
+	}
 	if msg == redislibs.Pack_command("COMMAND") {
 		msg = redislibs.Pack_command("PING")
 	}
-	if resp, err := ae.fetcher([]byte(msg)); err == nil {
-		network.SyscallWrite(fd, resp, BufferSize)
-	} else {
-		network.SyscallWrite(fd, []byte(errRedisDown.Error()), BufferSize)
+	counter := bytes.Count(b, []byte(redislibs.SYM_STAR))
+	for i := 0; i < counter; i++ {
+		if resp, err := ae.Fetcher(fd, []byte(msg)); err == nil {
+			network.SyscallWrite(fd, resp, BufferSize)
+		} else {
+			network.SyscallWrite(fd, []byte(errRedisDown.Error()), BufferSize)
+		}
 	}
+
 }
 
-func (ae *aeApiState) accept() {
-	connFd, _, err := syscall.Accept(ae.skfd)
+func (ae *aeApiState) Fetcher(fd int, reqs []byte) ([]byte, error) {
+	redisConn, err := ae.cm.FetchConn(fd)
+	if err != nil {
+		return nil, err
+	}
+	if err = redisConn.Write([]byte(reqs)); err != nil {
+		log.Error(err.Error())
+		ae.CloseConn(fd)
+		return nil, err
+	}
+	return redisConn.ReadAll()
+}
+
+func (ae *aeApiState) Accept() {
+	fd, _, err := syscall.Accept(ae.skfd)
 	if isEINTR(err) {
-		ae.accept()
+		ae.Accept()
 	}
 	if err != nil {
 		log.Fatal("accept err: ", err)
 		return
 	}
-	log.Info("new connection:", connFd)
-	syscall.SetNonblock(connFd, true)
-	ae.addEvent(connFd)
+	log.Debug("new connection:", fd)
+	syscall.SetNonblock(fd, true)
+	ae.addEvent(fd)
+	ae.cm.NewConn(fd)
+}
+
+func (ae *aeApiState) CloseConn(fd int) {
+	ae.cm.CloseConn(fd)
+	ae.delEvent(fd)
 }
 
 func socket() (int, error) {

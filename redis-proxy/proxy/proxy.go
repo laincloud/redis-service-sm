@@ -9,8 +9,7 @@ import (
 )
 
 type Proxy struct {
-	pool *network.Pool
-	aes  *aeApiState
+	aes *aeApiState
 }
 
 func NewProxy() *Proxy {
@@ -33,16 +32,16 @@ func NewProxy() *Proxy {
 		if err := c.Write([]byte(redislibs.COMMAND_PING)); err != nil {
 			return false
 		}
-		// clear test response info
-		if _, err := c.ReadAll(); err != nil {
+		if resp, err := c.ReadAll(); err != nil {
 			return false
 		}
 		return true
 	})
 
-	p := &Proxy{pool: pool}
+	// p := &Proxy{pool: pool}
+	cm := NewConnManager(pool)
 
-	p.aes = aeApiStateCreate(p.redisMsgFetcher)
+	p := &Proxy{aes: aeApiStateCreate(cm)}
 
 	return p
 }
@@ -55,18 +54,18 @@ func (p *Proxy) StartServer() {
 }
 
 func (p *Proxy) StopServer() {
-	p.aes.close()
+	p.aes.Close()
 }
 
-func (p *Proxy) redisMsgFetcher(reqs []byte) ([]byte, error) {
-	redisConn, err := p.pool.FetchConn()
-	if err != nil {
-		return nil, err
-	}
-	defer p.pool.Finished(redisConn)
-	if err = redisConn.Write([]byte(reqs)); err != nil {
-		log.Error(err.Error())
-		return nil, err
-	}
-	return redisConn.ReadAll()
-}
+// func (p *Proxy) redisMsgFetcher(reqs []byte) ([]byte, error) {
+// 	redisConn, err := p.pool.FetchConn()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer p.pool.Finished(redisConn)
+// 	if err = redisConn.Write([]byte(reqs)); err != nil {
+// 		log.Error(err.Error())
+// 		return nil, err
+// 	}
+// 	return redisConn.ReadAll()
+// }

@@ -14,11 +14,11 @@ type aeApiState struct {
 	kq      int
 	skfd    int
 	events  []syscall.Kevent_t
-	fetcher msgFetcher
 	timeout *syscall.Timespec
+	cm      *ConnManager
 }
 
-func aeApiStateCreate(fetcher msgFetcher) *aeApiState {
+func aeApiStateCreate(cm *ConnManager) *aeApiState {
 
 	fd, err := socket()
 	if err != nil {
@@ -36,7 +36,7 @@ func aeApiStateCreate(fetcher msgFetcher) *aeApiState {
 		Sec:  0,
 		Nsec: 0,
 	}
-	ae := &aeApiState{skfd: fd, kq: kq, events: events, fetcher: fetcher, timeout: &timeout}
+	ae := &aeApiState{skfd: fd, kq: kq, events: events, timeout: &timeout, cm: cm}
 	ae.addEvent(fd)
 	return ae
 }
@@ -48,7 +48,7 @@ func (ae *aeApiState) startAeApiPoll() {
 			if isEINTR(err) {
 				continue
 			}
-			log.Info("Error creating kevent")
+			log.Error("Error creating kevent")
 		}
 		if nev == 0 {
 			time.Sleep(100 * time.Microsecond)
@@ -56,11 +56,11 @@ func (ae *aeApiState) startAeApiPoll() {
 		}
 		for i := 0; i < nev; i++ {
 			if ae.events[i].Ident == uint64(ae.skfd) {
-				ae.accept()
+				ae.Accept()
 			} else if ae.events[i].Flags&(syscall.EV_EOF|syscall.EV_ERROR) > 0 {
 				fd := int(ae.events[i].Ident)
 				log.Debug("close:", fd)
-				ae.delEvent(fd)
+				ae.CloseConn(fd)
 			} else {
 				ae.handleMessage(int(ae.events[i].Ident))
 			}
@@ -68,7 +68,7 @@ func (ae *aeApiState) startAeApiPoll() {
 	}
 }
 
-func (ae *aeApiState) close() {
+func (ae *aeApiState) Close() {
 	if ae == nil {
 		return
 	}

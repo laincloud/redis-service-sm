@@ -11,13 +11,13 @@ const (
 )
 
 type aeApiState struct {
-	epfd    int
-	skfd    int
-	events  [MaxEpollEvents]syscall.EpollEvent
-	fetcher msgFetcher
+	epfd   int
+	skfd   int
+	events [MaxEpollEvents]syscall.EpollEvent
+	cm     *ConnManager
 }
 
-func aeApiStateCreate(fetcher msgFetcher) *aeApiState {
+func aeApiStateCreate(cm *ConnManager) *aeApiState {
 	var event syscall.EpollEvent
 	var events [MaxEpollEvents]syscall.EpollEvent
 
@@ -39,7 +39,7 @@ func aeApiStateCreate(fetcher msgFetcher) *aeApiState {
 		log.Error("epoll_ctl: ", e)
 		return nil
 	}
-	ae := &aeApiState{epfd: epfd, skfd: fd, events: events, fetcher: fetcher}
+	ae := &aeApiState{epfd: epfd, skfd: fd, events: events, cm: cm}
 	return ae
 
 }
@@ -60,11 +60,11 @@ func (ae *aeApiState) startAeApiPoll() {
 				((event.Events & syscall.EPOLLIN) == 0) {
 				/* An error has occured on this fd, or the socket is not
 				   ready for reading (why were we notified then?) */
-				log.Info("close:", event.Fd)
-				ae.delEvent(int(event.Fd))
+				log.Debug("close:", event.Fd)
+				ae.CloseConn(int(event.Fd))
 				continue
 			} else if int(event.Fd) == ae.skfd {
-				ae.accept()
+				ae.Accept()
 			} else {
 				go ae.handleMessage(int(event.Fd))
 			}
