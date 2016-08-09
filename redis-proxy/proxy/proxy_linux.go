@@ -73,7 +73,7 @@ func (ae *aeApiState) startAeApiPoll() {
 	}
 }
 
-func (ae *aeApiState) close() {
+func (ae *aeApiState) Close() {
 	syscall.Close(ae.skfd)
 	syscall.Close(ae.epfd)
 }

@@ -3,7 +3,6 @@ package proxy
 import (
 	"github.com/laincloud/redis-libs/network"
 	"github.com/laincloud/redis-libs/redislibs"
-	"github.com/mijia/sweb/log"
 	"net"
 	"time"
 )
@@ -32,13 +31,12 @@ func NewProxy() *Proxy {
 		if err := c.Write([]byte(redislibs.COMMAND_PING)); err != nil {
 			return false
 		}
-		if resp, err := c.ReadAll(); err != nil {
+		if _, err := c.ReadAll(); err != nil {
 			return false
 		}
 		return true
 	})
 
-	// p := &Proxy{pool: pool}
 	cm := NewConnManager(pool)
 
 	p := &Proxy{aes: aeApiStateCreate(cm)}
@@ -56,16 +54,3 @@ func (p *Proxy) StartServer() {
 func (p *Proxy) StopServer() {
 	p.aes.Close()
 }
-
-// func (p *Proxy) redisMsgFetcher(reqs []byte) ([]byte, error) {
-// 	redisConn, err := p.pool.FetchConn()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer p.pool.Finished(redisConn)
-// 	if err = redisConn.Write([]byte(reqs)); err != nil {
-// 		log.Error(err.Error())
-// 		return nil, err
-// 	}
-// 	return redisConn.ReadAll()
-// }
