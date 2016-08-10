@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"bytes"
 	"github.com/laincloud/redis-libs/network"
 	"github.com/laincloud/redis-libs/redislibs"
 	"net"
@@ -31,7 +32,9 @@ func NewProxy() *Proxy {
 		if err := c.Write([]byte(redislibs.COMMAND_PING)); err != nil {
 			return false
 		}
-		if _, err := c.ReadAll(); err != nil {
+		if msg, err := c.ReadAll(); err != nil {
+			return false
+		} else if !bytes.Equal(msg, []byte("+PONG\r\n")) {
 			return false
 		}
 		return true

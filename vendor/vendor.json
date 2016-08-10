@@ -110,9 +110,9 @@
 			"revisionTime": "2016-08-06T01:12:25Z"
 		},
 		{
-			"checksumSHA1": "07OStn4O0diOmTZABDfNW0NCSuE=",
+			"checksumSHA1": "ugYyif+0J+OaAHZQuK028ggfCVU=",
 			"path": "github.com/laincloud/redis-libs/network",
-			"revision": "cd7ee594e2e183544c3ae99d60834b9cb38ea911",
+			"revision": "5df0f593cfac1c9558cf639217d84548fa693f64",
 			"revisionTime": "2016-08-06T01:12:25Z"
 		},
 		{

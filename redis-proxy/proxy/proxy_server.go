@@ -1,59 +1,73 @@
 package proxy
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"github.com/laincloud/redis-libs/network"
-	"github.com/laincloud/redis-libs/redislibs"
 	"github.com/mijia/sweb/log"
 	"net"
-	"strings"
 	"syscall"
 )
 
-var errRedisDown = errors.New("-Error redis is down\r\n")
+var (
+	errRedisDown      = errors.New("-Error redis is down\r\n")
+	errRedisDownBytes = []byte(errRedisDown.Error())
+)
 
 func (ae *aeApiState) handleMessage(fd int) {
 	b, err := network.SyscallRead(fd, BufferSize)
 	if err != nil {
-		network.SyscallWrite(fd, []byte(errRedisDown.Error()), BufferSize)
+		network.SyscallWrite(fd, &errRedisDownBytes, BufferSize)
 		return
 	}
-	msg := string(b)
-	if strings.Trim(msg, " ") == "" {
+	if len(bytes.TrimSpace(b)) == 0 {
 		return
 	}
-	if msg == redislibs.Pack_command("COMMAND") {
-		msg = redislibs.Pack_command("PING")
-	}
-	counter := bytes.Count(b, []byte(redislibs.SYM_STAR))
-	for i := 0; i < counter; i++ {
-		if resp, err := ae.Fetcher(fd, []byte(msg)); err == nil {
-			network.SyscallWrite(fd, resp, BufferSize)
+	if resp, err := ae.Fetcher(fd, &b); err == nil {
+		network.SyscallWrite(fd, &resp, BufferSize)
+	} else {
+		errorsBytes := []byte(err.Error())
+		if bytes.HasPrefix(errorsBytes, []byte("-Err")) || bytes.HasPrefix(errorsBytes, []byte("-Error")) {
+			network.SyscallWrite(fd, &errorsBytes, BufferSize)
 		} else {
-			errorstr := err.Error()
-			if strings.HasPrefix(errorstr, "-Err") || strings.HasPrefix(errorstr, "-Error") {
-				network.SyscallWrite(fd, []byte(errorstr), BufferSize)
-			} else {
-				network.SyscallWrite(fd, []byte(errRedisDown.Error()), BufferSize)
-			}
-
+			network.SyscallWrite(fd, &errRedisDownBytes, BufferSize)
 		}
 	}
-
 }
 
-func (ae *aeApiState) Fetcher(fd int, reqs []byte) ([]byte, error) {
+func CounterCmd(b *[]byte) int {
+	br := bufio.NewReader(bytes.NewReader(*b))
+	rr := network.NewRedisReader(br)
+	counts := 0
+	for {
+		if _, err := rr.ReadObject(); err != nil {
+			break
+		}
+		counts++
+	}
+	return counts
+}
+
+func (ae *aeApiState) Fetcher(fd int, reqs *[]byte) ([]byte, error) {
 	redisConn, err := ae.cm.FetchConn(fd)
 	if err != nil {
 		return nil, err
 	}
-	if err = redisConn.Write([]byte(reqs)); err != nil {
-		log.Error(err.Error())
+	if err = redisConn.Write([]byte(*reqs)); err != nil {
 		ae.CloseConn(fd)
 		return nil, err
 	}
-	return redisConn.ReadAll()
+	resps := make([]byte, 0)
+	counter := CounterCmd(reqs)
+	for i := 0; i < counter; i++ {
+		if resp, err := redisConn.ReadAll(); err != nil {
+			return nil, err
+		} else {
+			resps = append(resps, resp...)
+		}
+	}
+	return resps, nil
 }
 
 func (ae *aeApiState) Accept() {
