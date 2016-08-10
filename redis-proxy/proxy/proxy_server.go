@@ -31,7 +31,13 @@ func (ae *aeApiState) handleMessage(fd int) {
 		if resp, err := ae.Fetcher(fd, []byte(msg)); err == nil {
 			network.SyscallWrite(fd, resp, BufferSize)
 		} else {
-			network.SyscallWrite(fd, []byte(errRedisDown.Error()), BufferSize)
+			errorstr := err.Error()
+			if strings.HasPrefix(errorstr, "-Err") || strings.HasPrefix(errorstr, "-Error") {
+				network.SyscallWrite(fd, []byte(errorstr), BufferSize)
+			} else {
+				network.SyscallWrite(fd, []byte(errRedisDown.Error()), BufferSize)
+			}
+
 		}
 	}
 
