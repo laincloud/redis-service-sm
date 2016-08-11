@@ -104,28 +104,22 @@
 			"revisionTime": "2016-05-27T08:54:33Z"
 		},
 		{
-			"checksumSHA1": "f22jSW2hvStoSO+b7UEo8xufdlU=",
-			"path": "github.com/laincloud/redis-libs",
-			"revision": "cd7ee594e2e183544c3ae99d60834b9cb38ea911",
-			"revisionTime": "2016-08-06T01:12:25Z"
-		},
-		{
-			"checksumSHA1": "ugYyif+0J+OaAHZQuK028ggfCVU=",
+			"checksumSHA1": "qF3v8HvQcSDuAiaol1k2IfdiKfc=",
 			"path": "github.com/laincloud/redis-libs/network",
-			"revision": "5df0f593cfac1c9558cf639217d84548fa693f64",
-			"revisionTime": "2016-08-06T01:12:25Z"
+			"revision": "17a39a09e42c6463ff6d5fea35e54a9bd3cf1bbc",
+			"revisionTime": "2016-08-10T12:25:31Z"
 		},
 		{
 			"checksumSHA1": "IIwXsyGPAVMBGbwGB8MvYeBi0gM=",
 			"path": "github.com/laincloud/redis-libs/redislibs",
-			"revision": "e74a48be6e6f12bc1c713c4c34a62b79c53639b6",
-			"revisionTime": "2016-08-06T01:12:25Z"
+			"revision": "17a39a09e42c6463ff6d5fea35e54a9bd3cf1bbc",
+			"revisionTime": "2016-08-10T12:25:31Z"
 		},
 		{
 			"checksumSHA1": "cTey1/kbiHbQdI45Eh6g9cP+qdg=",
 			"path": "github.com/laincloud/redis-libs/utils",
-			"revision": "e74a48be6e6f12bc1c713c4c34a62b79c53639b6",
-			"revisionTime": "2016-08-06T01:12:25Z"
+			"revision": "17a39a09e42c6463ff6d5fea35e54a9bd3cf1bbc",
+			"revisionTime": "2016-08-10T12:25:31Z"
 		},
 		{
 			"checksumSHA1": "yj8KD7zx2Z+JHR+VelvojuSDurk=",

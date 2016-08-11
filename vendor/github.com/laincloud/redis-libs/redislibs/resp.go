@@ -76,7 +76,7 @@ func Pack_command(args ...string) string {
 }
 
 func (t *Talker) TalkRaw(commands string) (string, error) {
-	err := t.Write([]byte(commands))
+	err := t.WriteAll([]byte(commands))
 	if err != nil {
 		return "", nil
 	}
@@ -85,7 +85,7 @@ func (t *Talker) TalkRaw(commands string) (string, error) {
 }
 
 func (t *Talker) TalkForObject(commands string) (interface{}, error) {
-	err := t.Write([]byte(commands))
+	err := t.WriteAll([]byte(commands))
 	if err != nil {
 		return "", nil
 	}

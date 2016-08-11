@@ -3,7 +3,6 @@ package proxy
 import (
 	"github.com/laincloud/redis-libs/redislibs"
 	"github.com/laincloud/redis-service-sm/redis-lainlet/redislainlet"
-	// "github.com/mijia/sweb/log"
 	"time"
 )
 
@@ -14,7 +13,6 @@ func StartWatcher() {
 
 func checkMaster() {
 	for {
-		// log.Debug("checkMaster:", master_addr)
 		time.Sleep(time.Duration(CHECK_INTERVAL_MS) * time.Millisecond)
 		if avail_sentinel_addr != nil {
 			if master, err := redislibs.GetMasterAddrByName(avail_sentinel_addr.Host, avail_sentinel_addr.Port, MASTER_NAME_SENTINEL); err == nil {

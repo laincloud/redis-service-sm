@@ -17,27 +17,17 @@ var (
 	Time_out   int
 	Port       int
 
-	ConnTimeoutSec     int
-	ReadTimeoutSec     int
-	WriteTimeOutSec    int
-	BufferSize         int
-	MaxActive          int
-	MaxIdle            int
-	PoolIdleTimeOutSec int
+	ConnTimeoutSec int
+	BufferSize     int
 )
 
 func Config_proxy(c *config.Config) {
 	Max_client = 1000
 	Time_out = 10000
-	Port = 8889
+	Port = 6379
 
 	ConnTimeoutSec = 5
-	ReadTimeoutSec = 5
-	WriteTimeOutSec = 5
 	BufferSize = 1024
-	MaxActive = 1000
-	MaxIdle = 500
-	PoolIdleTimeOutSec = 60
 
 	if c == nil {
 		return
@@ -73,28 +63,8 @@ func Config_proxy(c *config.Config) {
 		BufferSize = 1024
 	}
 
-	if MaxActive, err = c.Int("proxy", "redisMaxActive"); err != nil {
-		MaxActive = 1000
-	}
-
-	if MaxIdle, err = c.Int("proxy", "redisMaxIdle"); err != nil {
-		MaxIdle = 500
-	}
-
-	if PoolIdleTimeOutSec, err = c.Int("proxy", "poolIdleTimeOutSec"); err != nil {
-		PoolIdleTimeOutSec = 60
-	}
-
 	if ConnTimeoutSec, err = c.Int("proxy", "redisConTimeoutSec"); err != nil {
 		ConnTimeoutSec = 5
-	}
-
-	if ReadTimeoutSec, err = c.Int("proxy", "redisReadTimeoutSec"); err != nil {
-		ReadTimeoutSec = 5
-	}
-
-	if WriteTimeOutSec, err = c.Int("proxy", "redisWriteTimeOutSec"); err != nil {
-		WriteTimeOutSec = 5
 	}
 
 }

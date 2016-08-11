@@ -3,6 +3,8 @@ package network
 import (
 	"errors"
 	"github.com/laincloud/redis-libs/utils"
+	// "github.com/mijia/sweb/log"
+	// "net"
 	"sync"
 	"time"
 )
@@ -194,10 +196,5 @@ func (p *Pool) Finished(c IConn) {
 	if c == nil {
 		return
 	}
-	if c.ShouldBeClosed() || p.closed {
-		p.closeConn(c)
-		return
-	}
-	p.put(c)
-
+	p.closeConn(c)
 }
