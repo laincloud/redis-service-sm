@@ -2,8 +2,7 @@ package network
 
 import (
 	"bufio"
-	"github.com/mijia/sweb/log"
-	// "io"
+	"io"
 	"os"
 	"strconv"
 	"syscall"
@@ -19,6 +18,31 @@ const (
 
 	SYM_CRLF = "\r\n"
 )
+
+type FdReader struct {
+	fd int
+}
+
+func NewFdReader(fd int) *FdReader {
+	return &FdReader{fd: fd}
+}
+
+func (f *FdReader) Read(b []byte) (n int, err error) {
+	for {
+		n, err = syscall.Read(f.fd, b)
+		if err != nil {
+			n = 0
+			if err == syscall.EAGAIN {
+				return n, err
+			}
+		}
+		break
+	}
+	if _, ok := err.(syscall.Errno); ok {
+		err = os.NewSyscallError("read", err)
+	}
+	return
+}
 
 func SyscallWrite(fd int, b *[]byte, aeBufferSize int) error {
 	from := 0
@@ -46,87 +70,25 @@ func SyscallWrite(fd int, b *[]byte, aeBufferSize int) error {
 	return nil
 }
 
-type NetFd struct {
-	fd int
-}
-
-func NewNetFd(fd int) *NetFd {
-	return &NetFd{fd: fd}
-}
-
-func (f *NetFd) Read(b []byte) (n int, err error) {
-	// n, err = syscall.Read(f.fd, b)
-	for {
-		n, err = syscall.Read(f.fd, b)
-		if err != nil {
-			log.Info("err:", err)
-			if err == syscall.EAGAIN {
-				time.Sleep(10 * time.Microsecond)
-				continue
-			}
-		}
-		break
-	}
-	if _, ok := err.(syscall.Errno); ok {
-		err = os.NewSyscallError("read", err)
-	}
-	return
-}
-
-func (f *NetFd) Write(b []byte) (n int, err error) {
-	size := len(b)
-	for {
-		n, err = syscall.Write(f.fd, b)
-		if err != nil {
-			log.Info("err:", err)
-			if err == syscall.EAGAIN {
-				time.Sleep(10 * time.Millisecond)
-				continue
-			}
-		} else if n < size {
-			log.Info(n, " : ", size)
-			size -= n
-			continue
-		}
-
-		break
-	}
-	// log.Info(size, "  write:", n)
-	return
-}
-
 func SyscallRead(fd int, aeBufferSize int) ([]byte, error) {
-	// fr := NewNetFd(fd)
-	// br := bufio.NewReader(fr)
-	// redisReader := NewRedisReader(br)
+	fr := NewFdReader(fd)
+	br := bufio.NewReader(fr)
+	redisReader := NewRedisReader(br)
 	msg := make([]byte, 0)
 	var err error
-	bf := make([]byte, aeBufferSize)
 	for {
-		if n, e := syscall.Read(fd, bf); e == nil {
-			if n <= 0 {
-				break
-			}
-			msg = append(msg, bf[:n]...)
+		if bf, e := redisReader.ReadObject(); e == nil {
+			msg = append(msg, bf...)
 		} else {
-			log.Error(e)
-			if e == syscall.EAGAIN || e == syscall.EWOULDBLOCK {
+			if pe, ok := e.(*os.PathError); ok {
+				e = pe.Err
+			}
+			if e == syscall.EAGAIN || e == syscall.EWOULDBLOCK || e == io.EOF {
 				break
 			}
 			err = e
+			break
 		}
-		// if bf, e := redisReader.ReadObject(); e == nil {
-		// 	msg = append(msg, bf...)
-		// } else {
-		// 	if pe, ok := e.(*os.PathError); ok {
-		// 		e = pe.Err
-		// 	}
-		// 	if e == syscall.EAGAIN || e == syscall.EWOULDBLOCK || e == io.EOF {
-		// 		break
-		// 	}
-		// 	err = e
-		// 	break
-		// }
 	}
 	return msg, err
 }

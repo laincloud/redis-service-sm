@@ -2,10 +2,7 @@ package network
 
 import (
 	"errors"
-	"github.com/mijia/sweb/log"
-	"io"
 	"net"
-	"os"
 	"syscall"
 	"time"
 )
@@ -15,123 +12,67 @@ var ErrConnNil = errors.New("Connector is Nil")
 type IConn interface {
 	net.Conn
 	ReadAll() ([]byte, error)
-	WriteAll(msg []byte) error
 	ShouldBeClosed() bool
-	StopConn()
 }
 
 type Conn struct {
 	net.Conn
-	cnop     *ConnectOption
-	err      error
-	stopConn chan struct{}
+	err error
 }
 
-func NewConnect(conn net.Conn, co *ConnectOption) (*Conn, error) {
+func NewConn(conn net.Conn) (*Conn, error) {
 	if conn == nil {
 		return nil, ErrConnNil
 	}
-	stopConn := make(chan struct{}, 1)
-	c := &Conn{Conn: conn, cnop: co, stopConn: stopConn}
+	c := &Conn{Conn: conn}
 	return c, nil
+}
+
+func (c *Conn) Write(b []byte) (int, error) {
+	n, err := c.Conn.Write(b)
+	c.err = err
+	return n, c.err
+}
+
+func (c *Conn) Read(b []byte) (int, error) {
+	n, err := c.Conn.Read(b)
+	c.err = err
+	return n, c.err
+}
+
+func (c *Conn) ReadAll() ([]byte, error) {
+	return nil, syscall.ENOSYS
 }
 
 func (c *Conn) ShouldBeClosed() bool {
 	return c.err != nil
 }
 
-func (c *Conn) StopConn() {
-	c.stopConn <- struct{}{}
+type TimeoutConn struct {
+	*Conn
+	cnop *ConnectOption
 }
 
-func (c *Conn) Read(b []byte) (n int, err error) {
-	select {
-	case <-c.stopConn:
-		err = io.EOF
-		log.Error("eof")
-		return
-	default:
-		n, err = c.Conn.Read(b)
-		c.err = err
-		break
+func NewTimeoutConn(conn net.Conn, cnop *ConnectOption) (*TimeoutConn, error) {
+	cn, err := NewConn(conn)
+	if err != nil {
+		return nil, err
 	}
-	// ch := make(chan struct{})
-	// go func(ch chan struct{}) {
-	// 	n, err = c.Conn.Read(b)
-	// 	c.err = err
-	// 	ch <- struct{}{}
-	// }(ch)
-	// select {
-	// case <-ch:
-	// 	break
-	// case <-c.stopConn:
-	// 	err = io.EOF
-	// 	log.Error("eof")
-	// 	break
-	// }
-	return
+	c := &TimeoutConn{Conn: cn, cnop: cnop}
+	return c, nil
 }
 
-func (c *Conn) Write(b []byte) (n int, err error) {
-	for {
-		if n, err = c.Conn.Write(b); err != nil {
-			log.Error(err)
-			if pe, ok := err.(*os.PathError); ok {
-				err = pe.Err
-			}
-			if err == syscall.EAGAIN || err == syscall.EWOULDBLOCK {
-				continue
-			}
-		}
-		break
-	}
-	c.err = err
-	return
-}
-
-func (c *Conn) WriteAll(b []byte) error {
-	if c == nil {
-		return ErrConnNil
-	}
+func (c *TimeoutConn) Write(b []byte) (int, error) {
 	c.SetWriteDeadline(time.Now().Add(c.cnop.wrteTimeOutSec))
-	size := len(b)
-	from := 0
-	for {
-		n, err := c.Conn.Write(b[from:])
-		if err != nil {
-			if err == syscall.EAGAIN || err == syscall.EWOULDBLOCK {
-				time.Sleep(10 * time.Millisecond)
-				continue
-			}
-			c.err = err
-			break
-		}
-		from += n
-		if from == size {
-			break
-		}
-	}
-	return c.err
+	return c.Conn.Write(b)
 }
 
-func (c *Conn) ReadAll() ([]byte, error) {
-	if c == nil {
-		return nil, ErrConnNil
-	}
+func (c *TimeoutConn) Read(b []byte) (int, error) {
+	c.SetReadDeadline(time.Now().Add(c.cnop.wrteTimeOutSec))
+	return c.Conn.Read(b)
+}
+
+func (c *TimeoutConn) ReadAll() ([]byte, error) {
 	c.SetReadDeadline(time.Now().Add(c.cnop.readTimeOutSec))
-	res := make([]byte, 0, 0)
-	bufferSize := c.cnop.bufferSize
-	buffer := make([]byte, bufferSize)
-	for {
-		n, err := c.Conn.Read(buffer)
-		if err != nil {
-			c.err = err
-			return res, err
-		}
-		res = append(res, buffer[:n]...)
-		if n < bufferSize {
-			break
-		}
-	}
-	return res, nil
+	return c.ReadAll()
 }

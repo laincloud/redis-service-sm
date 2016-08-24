@@ -3,8 +3,6 @@ package network
 import (
 	"errors"
 	"github.com/laincloud/redis-libs/utils"
-	// "github.com/mijia/sweb/log"
-	// "net"
 	"sync"
 	"time"
 )
@@ -52,10 +50,9 @@ type idleConn struct {
 type dialer func() (IConn, error)
 type connStateTestFunc func(c IConn) bool
 
-func NewConnectionPool(co *ConnectOption, _dialer dialer, maxActive, maxIdle, idleTimeOutSec int) *Pool {
+func NewConnectionPool(_dialer dialer, maxActive, maxIdle, idleTimeOutSec int) *Pool {
 	idles := utils.NewQueue()
 	return &Pool{
-		co:             co,
 		idles:          idles,
 		_dialer:        _dialer,
 		activeSize:     0,
@@ -151,12 +148,10 @@ func (p *Pool) fetchConn() (IConn, error) {
 			break
 		}
 		// test state of c
-		if p.connStateTest != nil {
-			b := p.connStateTest(c)
-			if !b {
-				p.closeConn(c)
-				continue
-			}
+		test := p.connStateTest
+		if test != nil && test(c) {
+			p.closeConn(c)
+			continue
 		}
 		return c, nil
 	}
@@ -192,9 +187,14 @@ func (p *Pool) Close() {
 	}
 }
 
-func (p *Pool) Finished(c IConn) {
+func (p *Pool) FinishConn(c IConn) {
 	if c == nil {
 		return
 	}
-	p.closeConn(c)
+	if c.ShouldBeClosed() || p.closed {
+		p.closeConn(c)
+		return
+	}
+	p.put(c)
+
 }
