@@ -13,6 +13,7 @@ var (
 )
 
 func (p *Proxy) connectionHandler(conn net.Conn) {
+	log.Debug("receive connection from ", conn.RemoteAddr())
 	defer p.disconnect(conn)
 	redisConn, err := p.FetchConn()
 	if err != nil {
@@ -38,6 +39,7 @@ func (p *Proxy) FetchConn() (net.Conn, error) {
 }
 
 func pipe(dst, src net.Conn, isSrcClosed chan<- struct{}) {
+	defer close(isSrcClosed)
 	if _, err := io.Copy(dst, src); err != nil {
 		log.Debug("copy err:", err)
 	}

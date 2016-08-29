@@ -1,28 +1,33 @@
 package proxy
 
 import (
-	"github.com/laincloud/redis-libs/redislibs"
-	"github.com/mijia/sweb/log"
-	"net"
+	"math/rand"
+	"strconv"
 	"testing"
-	"time"
+
+	redis "gopkg.in/redis.v4"
 )
 
-// func Test_LainLet(t *testing.T) {
-// 	// LainLet()
-// 	fmt.Println(runtime.GOOS)
-// }
+const (
+	RedisAddr = "127.0.0.1:6379"
+)
 
-func Test_Kqueue(t *testing.T) {
-	defer log.Info("out")
-	Load_config("../proxy.conf")
-	if DEBUG {
-		log.EnableDebug()
-	}
+func thread_test(client *redis.Client) {
 	for {
-		p := NewProxy()
-		p.StartServer()
-		p.StopServer()
-		time.Sleep(60 * time.Second)
+		client.Set(strconv.Itoa(rand.Intn(10000)), rand.Intn(10000), 0)
 	}
+}
+
+func Test_redis(t *testing.T) {
+	client := redis.NewClient(&redis.Options{
+		Addr:     RedisAddr,
+		Password: "",
+		DB:       0,
+		PoolSize: 100,
+	})
+	singal := make(chan struct{}, 1)
+	for i := 0; i < 100; i++ {
+		go thread_test(client)
+	}
+	<-singal
 }
